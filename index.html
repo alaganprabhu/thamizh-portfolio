@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel ="icon" href="./img/favicon.png" sizes="5000x5000" >
   <title>Thamil Alagan — Portfolio</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
@@ -32,7 +33,7 @@
     nav.scrolled { border-bottom-color:var(--br); padding:13px 60px; }
     .nav-logo {
       font-family:'Fira Code',monospace; font-size:.95rem; font-weight:600;
-      color:var(--t1); text-decoration:none; display:flex; align-items:center; gap:6px;
+      color:var(--t1); text-decoration:none; display:flex; align-items:center; gap:2px;
     }
     .nav-logo span { background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
     .nav-links { display:flex; align-items:center; gap:34px; list-style:none; }
@@ -97,7 +98,7 @@
     }
     .btn-s:hover { color:var(--t1); border-color:var(--blue); background:rgba(79,142,247,.06); transform:translateY(-2px); }
     .hero-stats { display:flex; gap:30px; margin-top:44px; padding-top:32px; border-top:1px solid var(--br); }
-    .stat-num { font-size:1.7rem; font-weight:800; background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .stat-num { font-size:1.7rem; font-weight:800; background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; text-align: center;}
     .stat-lbl { font-size:.68rem; color:var(--t3); text-transform:uppercase; letter-spacing:.1em; margin-top:2px; }
     .hero-visual { position:relative; z-index:1; display:flex; justify-content:center; }
     .avatar-box {
@@ -336,7 +337,8 @@
 
 <!-- ── NAVBAR ── -->
 <nav id="nav">
-  <a href="#home" class="nav-logo"><span>TA.</span>dev</a>
+  <a href="#home" class="nav-logo"><span>THAMIZH.</span>dev</a>
+  <!-- <a href="#home" class="nav-logo"><span>THAMIZH.</span>dev</a> -->
   <ul class="nav-links">
     <li><a href="#about">About</a></li>
     <li><a href="#competencies">Skills</a></li>
@@ -355,7 +357,7 @@
       <div class="sec-label">Hello, I'm</div>
       <h1 class="hero-name">Thamil Alagan&nbsp;<span class="hl">R</span></h1>
       <p class="hero-role">Web Developer &nbsp;|&nbsp; <span>MERN</span> &nbsp;|&nbsp; UI Developer</p>
-      <p class="hero-desc">Building scalable web applications, Shopify apps, and API-driven platforms with <span style="color:var(--cyan);font-weight:500;">2.4 years</span> of professional experience in high-growth environments.</p>
+      <p class="hero-desc">Building scalable web applications, Responsive UI Designs, and API-driven platforms with <span style="color:var(--cyan);font-weight:500;">3 years</span> of professional experience in high-growth environments.</p>
       <div class="hero-btns">
         <a href="#projects" class="btn-p">View Professional Work</a>
         <a href="#contact" class="btn-s">Contact Me</a>
@@ -363,13 +365,13 @@
       <div style="display: flex; align-items: baseline; gap: 10px;">
 
         <div class="hero-stats">
-          <div><div class="stat-num">2.4+</div><div class="stat-lbl">Years Exp.</div></div>
+          <div><div class="stat-num">3</div><div class="stat-lbl">Years Exp.</div></div>
          
           <!-- <div><div class="stat-num">10+</div><div class="stat-lbl">Projects</div></div>
           <div><div class="stat-num">5+</div><div class="stat-lbl">Stacks</div></div> -->
         </div>
          <div >
-          <a href="file/Thamil Alagan R.pdf" class="btn-p">Resume</a>
+          <a href="file/Thamil Alagan R.pdf" target="_blank" class="btn-p">Resume</a>
         </div>
       </div>
     </div>
@@ -424,6 +426,7 @@
           <li>JavaScript</li><li>TypeScript</li>
           <li>Tailwind CSS</li>
           <li>HTML / CSS</li>
+          <li>Responsive UI Design</li>
           <li>Webflow</li>
         </ul>
       </div>
@@ -432,9 +435,12 @@
         <h3>Backend</h3>
         <ul class="comp-list">
           <li>Node JS</li><li>Express JS</li><li>REST APIs</li>
-          <li>GraphQL</li>
+          <!-- <li>GraphQL</li> -->
           <!-- <li>FED / Third-party APIs</li> -->
           <li>MongoDB</li>
+          <li>API Design</li>
+          <li>Express Route</li>
+          <li>DB Design</li>
         </ul>
       </div>
       <div class="comp-card rv d3">
@@ -620,7 +626,7 @@
 </section>
 
 <!-- ── PERSONAL / OPEN SOURCE ── -->
-<section id="personal">
+<!-- <section id="personal">
   <div class="container">
     <div class="sec-label rv">Side Work</div>
     <h2 class="sec-title rv">Personal / Open <span class="hl">Source</span></h2>
@@ -645,7 +651,7 @@
       </div>
     </div>
   </div>
-</section>
+</section> -->
 
 <!-- ── CONTACT ── -->
 <section id="contact">
@@ -656,12 +662,17 @@
     <div class="c-grid">
       <div class="rv-l">
         <p class="c-intro">Have a technical challenge or an enterprise-scale project in mind? Let's discuss your roadmap and build something resilient.</p>
-        <div class="c-item"><div class="c-ico">✉️</div><div><div class="c-lbl">Email</div><div class="c-val"><a href="mailto:thamil.dev@proton.me">thamil.dev@proton.me</a></div></div></div>
-        <div class="c-item"><div class="c-ico">🔗</div><div><div class="c-lbl">LinkedIn</div><div class="c-val"><a href="https://linkedin.com/in/thamil-alagan" target="_blank">linkedin.com/in/thamil-alagan</a></div></div></div>
+        <div class="c-item"><div class="c-ico">✉️</div><div><div class="c-lbl">Email</div><div class="c-val"><a href="mailto:thamizhalagan8@gmail.com">thamizhalagan8@gmail.com</a></div></div></div>
+        <div class="c-item"><div class="c-ico">🔗</div><div><div class="c-lbl">LinkedIn</div><div class="c-val"><a href="https://www.linkedin.com/in/thamilalagan/" target="_blank">linkedin.com/in/thamilalagan</a></div></div></div>
         <div class="c-item"><div class="c-ico">📍</div><div><div class="c-lbl">Location</div><div class="c-val">Coimbatore, India</div></div></div>
+        <div class="c-item"><div class="c-ico">📞</div><div><div class="c-lbl">Mobile</div><div class="c-val">9080445205</div></div></div>
+        <div class="c-item"><div class="c-ico">💼</div><div><div class="c-lbl">Status</div><div class="c-val">Open to Frontend React.js / MERN opportunities</div> <span class="c-val">Immediate Joiner</span></div></div>
+        <div class="c-item">
+          <a href="file/Thamil Alagan R.pdf" target="_blank" class="btn-p" download="Thamil Alagan R - Resume">Download Resume</a>
+        </div>
         <!-- <div class="c-item"><div class="c-ico">💻</div><div><div class="c-lbl">GitHub</div><div class="c-val"><a href="https://github.com/thamil-alagan" target="_blank">github.com/thamil-alagan</a></div></div></div> -->
       </div>
-      <div class="rv-r">
+      <!-- <div class="rv-r">
         <div class="f-row">
           <div class="fg"><label>Your Name</label><input type="text" placeholder="John Doe" /></div>
           <div class="fg"><label>Your Email</label><input type="email" placeholder="john@example.com" /></div>
@@ -669,17 +680,17 @@
         <div class="fg"><label>Subject</label><input type="text" placeholder="Project idea or challenge" /></div>
         <div class="fg"><label>Your Message</label><textarea placeholder="Tell me about your project..."></textarea></div>
         <button class="form-btn"><span>Send Message</span><span>→</span></button>
-      </div>
+      </div> -->
     </div>
   </div>
 </section>
 
 <!-- ── FOOTER ── -->
 <footer>
-  <div class="f-copy">© 2025 <span>Thamil Alagan R</span> — Built with ❤ and TypeScript.</div>
+  <div class="f-copy">© 2026 <span>Thamil Alagan R</span> </div>
   <div class="f-links">
     <a href="#home">Back to Top ↑</a>
-    <a href="https://github.com" target="_blank">GitHub</a>
+    <!-- <a href="https://github.com" target="_blank">GitHub</a> -->
     <a href="https://linkedin.com" target="_blank">LinkedIn</a>
   </div>
 </footer>
