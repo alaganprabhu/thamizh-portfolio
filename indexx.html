@@ -245,6 +245,7 @@
       max-width: 1100px;
       width: 100%;
       display: grid;
+      /*grid-template-columns:1fr 1fr; */
       gap: 60px;
       align-items: center;
     }
@@ -1160,11 +1161,7 @@
       transition-delay: .4s;
     }
 
-    /* ══════════════════════════════════════════════════════════
-       FEATURED PROJECTS — 3D "COVERFLOW" SLIDER
-       (this is the block that produces the tilted side-cards +
-       neon-glow center card look from the reference image)
-       ══════════════════════════════════════════════════════════ */
+    /* ── FEATURED PROJECTS CAROUSEL ── */
     #featured {
       background: var(--bg);
     }
@@ -1179,79 +1176,81 @@
       color: var(--blue);
     }
 
-    /* 1) STAGE — gives the 3D perspective the cards rotate inside */
-    .cf-carousel {
+    /* Carousel shell */
+    .fp-carousel {
       position: relative;
     }
 
-    .cf-stage {
-      position: relative;
-      height: 460px;
-      perspective: 1400px;
-      /* how "deep" the 3D effect looks   */
-      perspective-origin: 50% 45%;
+    .fp-viewport {
+      overflow: hidden;
+      border-radius: 18px;
+      /* side-peek fade on mobile/tablet */
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%);
+      mask-image: linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%);
     }
 
-    /* soft glow pool under the stage, standing in for the reflection
-       in the reference image (mirroring real DOM content is heavy,
-       so a blurred glow reads the same at a fraction of the code) */
-    .cf-stage::after {
+    /* On desktop (all cards fit) remove the fade */
+    .fp-carousel.fp-desktop .fp-viewport {
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+
+    .fp-track {
+      display: flex;
+      gap: 24px;
+      transition: transform .5s cubic-bezier(.4, 0, .2, 1);
+      will-change: transform;
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      .fp-track {
+        transition: none;
+      }
+    }
+
+    /* Card — identical visual to original */
+    .fp-card {
+      background: var(--card);
+      border: 1px solid var(--br);
+      border-radius: 16px;
+      padding: 30px 28px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      flex: 0 0 auto;
+      /* carousel: fixed width via JS */
+      transition: transform .3s, border-color .3s, box-shadow .3s, opacity .4s;
+    }
+
+    .fp-card::before {
       content: '';
       position: absolute;
-      left: 50%;
-      bottom: -10px;
-      width: 320px;
-      height: 60px;
-      background: radial-gradient(ellipse at center, rgba(56, 189, 248, .35), transparent 70%);
-      filter: blur(18px);
-      transform: translateX(-50%);
-      pointer-events: none;
-    }
-
-    /* 2) CARD — every card sits stacked/centered by default;
-       JS applies translateX / translateZ / rotateY / scale per-card
-       depending on its distance from the active (center) index */
-    .cf-card {
-      position: absolute;
       top: 0;
-      left: 50%;
-      width: 280px;
-      height: 440px;
-      margin-left: -140px;
-      background: var(--card);
-      border: 2px solid var(--cyan);
-      border-radius: 18px;
-      padding: 26px 24px;
-      overflow: hidden;
-      cursor: pointer;
-      transform-style: preserve-3d;
-      box-shadow:
-        0 0 0 rgba(56, 189, 248, 0),
-        inset 0 0 24px rgba(56, 189, 248, .06);
-      /* the transition is what makes clicking/auto-advance glide
-         instead of jump — transform/opacity/filter/box-shadow all animate */
-      transition: transform .6s cubic-bezier(.4, 0, .2, 1),
-        opacity .6s ease,
-        filter .6s ease,
-        box-shadow .6s ease;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--grad);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .4s;
     }
 
-    /* 3) STATE CLASSES — JS toggles these; each maps to a "depth" */
-    .cf-card--center {
-      box-shadow:
-        0 0 26px rgba(56, 189, 248, .55),
-        0 0 60px rgba(56, 189, 248, .25),
-        inset 0 0 30px rgba(56, 189, 248, .1);
-      filter: brightness(1);
+    .fp-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--brh);
+      box-shadow: 0 24px 64px rgba(79, 142, 247, .1);
     }
 
-    .cf-card--side {
-      filter: brightness(.55) saturate(.8);
+    .fp-card:hover::before {
+      transform: scaleX(1);
     }
 
-    .cf-card--hidden {
-      opacity: 0 !important;
+    /* Dim non-active cards on mobile/tablet */
+    .fp-card.fp-dim {
+      opacity: .45;
       pointer-events: none;
+      transform: scale(.97);
     }
 
     .fp-card-icon {
@@ -1263,12 +1262,17 @@
       align-items: center;
       justify-content: center;
       font-size: 1.2rem;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
+      transition: background .3s;
+    }
+
+    .fp-card:hover .fp-card-icon {
+      background: rgba(79, 142, 247, .18);
     }
 
     .fp-card-type {
       font-family: 'Fira Code', monospace;
-      font-size: .6rem;
+      font-size: .62rem;
       color: var(--blue);
       letter-spacing: .12em;
       text-transform: uppercase;
@@ -1276,145 +1280,194 @@
     }
 
     .fp-card-title {
-      font-size: .98rem;
+      font-size: 1.05rem;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
+      transition: color .2s;
     }
 
-    /* Scrollable inner wrapper — lets each card hold a cover image +
-       full description without growing the card itself. The card
-       (.cf-card) stays a fixed size for the 3D transforms; this is
-       the only element that scrolls. */
-    .cf-card-body {
-      height: 100%;
-      overflow-y: auto;
-      padding-right: 6px;
-      /* keeps text off the scrollbar   */
-      scrollbar-width: thin;
-      scrollbar-color: var(--brh) transparent;
-    }
-
-    .cf-card-body::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    .cf-card-body::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    .cf-card-body::-webkit-scrollbar-thumb {
-      background: var(--brh);
-      border-radius: 2px;
-    }
-
-    /* Project cover image — sits at the top of the card body */
-    .fp-card-cover {
-      display: block;
-      width: 100%;
-      height: 130px;
-      object-fit: cover;
-      border-radius: 10px;
-      margin-bottom: 14px;
-      border: 1px solid var(--br);
+    .fp-card:hover .fp-card-title {
+      color: var(--cyan);
     }
 
     .fp-card-desc {
-      font-size: .74rem;
+      font-size: .8rem;
       color: var(--t2);
-      line-height: 1.65;
-      margin-bottom: 14px;
-      /* no line-clamp here — the body scrolls, so full text is fine */
+      line-height: 1.85;
+      margin-bottom: 18px;
+    }
+
+    .fp-feat-lbl {
+      font-size: .6rem;
+      color: var(--purple);
+      font-family: 'Fira Code', monospace;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 9px;
+    }
+
+    .fp-feats {
+      list-style: none;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .fp-feats li {
+      font-size: .76rem;
+      color: var(--t2);
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      line-height: 1.5;
+    }
+
+    .fp-feats li::before {
+      content: '▹';
+      color: var(--blue);
+      font-size: .6rem;
+      margin-top: 3px;
+      flex-shrink: 0;
     }
 
     .fp-tags {
       display: flex;
       flex-wrap: wrap;
-      gap: 5px;
-      margin-bottom: 18px;
+      gap: 6px;
+      margin-bottom: 24px;
     }
 
     .fp-tag {
-      padding: 3px 9px;
+      padding: 3px 10px;
       background: #111124;
       border: 1px solid #1e1e38;
       border-radius: 4px;
-      font-size: .6rem;
+      font-size: .63rem;
       color: var(--t2);
       font-family: 'Fira Code', monospace;
       letter-spacing: .05em;
+      transition: background .2s, color .2s, border-color .2s;
+    }
+
+    .fp-tag:hover {
+      background: rgba(79, 142, 247, .1);
+      color: var(--cyan);
+      border-color: rgba(79, 142, 247, .3);
     }
 
     .fp-btns {
       display: flex;
-      gap: 8px;
+      gap: 9px;
       flex-wrap: wrap;
+      margin-top: auto;
     }
 
     .fp-btn-gh {
-      padding: 7px 14px;
+      padding: 8px 16px;
       background: transparent;
       color: var(--t2);
       border: 1px solid var(--brh);
       border-radius: 6px;
-      font-size: .68rem;
+      font-size: .72rem;
       font-weight: 500;
+      cursor: pointer;
       text-decoration: none;
-      display: inline-flex;
+      display: flex;
       align-items: center;
       gap: 6px;
+      transition: color .3s, border-color .3s, background .3s, transform .2s;
+    }
+
+    .fp-btn-gh:hover {
+      color: var(--t1);
+      border-color: var(--blue);
+      background: rgba(79, 142, 247, .06);
+      transform: translateY(-2px);
     }
 
     .fp-btn-demo {
-      padding: 7px 14px;
+      padding: 8px 16px;
       background: var(--grad);
       color: #fff;
       border: none;
       border-radius: 6px;
-      font-size: .68rem;
+      font-size: .72rem;
       font-weight: 600;
+      cursor: pointer;
       text-decoration: none;
-      display: inline-flex;
+      display: flex;
       align-items: center;
       gap: 6px;
+      transition: transform .2s, box-shadow .3s, opacity .2s;
     }
 
-    /* 4) CONTROLS — arrows + dots below the stage */
-    .cf-controls {
+    .fp-btn-demo:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(79, 142, 247, .3);
+      opacity: .92;
+    }
+
+    /* ── Controls row ── */
+    .fp-controls {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 22px;
-      margin-top: 28px;
+      margin-top: 32px;
     }
 
-    .cf-arrow {
+    .fp-carousel.fp-desktop .fp-controls {
+      display: none;
+    }
+
+    /* hide when all cards visible */
+
+    /* Arrow buttons */
+    .fp-arrow {
       width: 42px;
       height: 42px;
       border-radius: 50%;
       background: var(--card);
       border: 1px solid var(--brh);
-      color: var(--t2);
-      font-size: 1rem;
-      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background .25s, border-color .25s, color .25s, transform .2s;
+      cursor: pointer;
+      color: var(--t2);
+      font-size: 1rem;
+      transition: background .25s, border-color .25s, color .25s, transform .2s, box-shadow .25s;
+      flex-shrink: 0;
+      outline: none;
     }
 
-    .cf-arrow:hover {
-      background: rgba(56, 189, 248, .12);
-      border-color: var(--cyan);
+    .fp-arrow:hover,
+    .fp-arrow:focus-visible {
+      background: rgba(79, 142, 247, .12);
+      border-color: var(--blue);
       color: var(--t1);
       transform: scale(1.08);
+      box-shadow: 0 0 0 3px rgba(79, 142, 247, .15);
     }
 
-    .cf-dots {
+    .fp-arrow:active {
+      transform: scale(.96);
+    }
+
+    .fp-arrow:disabled {
+      opacity: .28;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    /* Dot pagination */
+    .fp-dots {
       display: flex;
+      align-items: center;
       gap: 8px;
     }
 
-    .cf-dot {
+    .fp-dot {
       width: 7px;
       height: 7px;
       border-radius: 50%;
@@ -1422,21 +1475,18 @@
       border: none;
       cursor: pointer;
       padding: 0;
-      transition: background .3s, width .3s;
+      transition: background .3s, transform .3s, width .3s;
+      outline: none;
     }
 
-    .cf-dot.active {
-      background: var(--cyan);
+    .fp-dot.active {
+      background: var(--blue);
       width: 22px;
       border-radius: 4px;
     }
 
-    @media(max-width:640px) {
-      .cf-card {
-        width: 230px;
-        height: 400px;
-        margin-left: -115px;
-      }
+    .fp-dot:focus-visible {
+      box-shadow: 0 0 0 3px rgba(79, 142, 247, .3);
     }
 
     /* ── CURSOR ── */
@@ -1500,14 +1550,6 @@
       .f-row {
         grid-template-columns: 1fr;
       }
-
-      #fpCarousel .carousel-control-prev {
-        left: 0;
-      }
-
-      #fpCarousel .carousel-control-next {
-        right: 0;
-      }
     }
   </style>
 </head>
@@ -1519,6 +1561,7 @@
   <!-- ── NAVBAR ── -->
   <nav id="nav">
     <a href="#home" class="nav-logo"><span>THAMIZH.</span>dev</a>
+    <!-- <a href="#home" class="nav-logo"><span>THAMIZH.</span>dev</a> -->
     <ul class="nav-links">
       <li><a href="#about">About</a></li>
       <li><a href="#competencies">Skills</a></li>
@@ -1540,8 +1583,7 @@
         <p class="hero-role">Web Developer &nbsp;|&nbsp; <span>MERN</span> &nbsp;|&nbsp; UI Developer</p>
         <p class="hero-desc">Building scalable web applications, Responsive UI Designs, and API-driven platforms with
           <span style="color:var(--cyan);font-weight:500;">3 years</span> of professional experience in high-growth
-          environments.
-        </p>
+          environments.</p>
         <div class="hero-btns">
           <a href="#projects" class="btn-p">View Professional Work</a>
           <a href="#contact" class="btn-s">Contact Me</a>
@@ -1553,12 +1595,22 @@
               <div class="stat-num">3</div>
               <div class="stat-lbl">Years Exp.</div>
             </div>
+
+            <!-- <div><div class="stat-num">10+</div><div class="stat-lbl">Projects</div></div>
+          <div><div class="stat-num">5+</div><div class="stat-lbl">Stacks</div></div> -->
           </div>
           <div>
             <a href="file/Thamil Alagan R.pdf" target="_blank" class="btn-p">Resume</a>
           </div>
         </div>
       </div>
+      <!-- <div class="hero-visual">
+      <div class="avatar-box">
+        <div class="img-ph"><div class="ic">👤</div><p>// Your Photo</p></div>
+        <div class="badge badge-1"><span>React</span> · Node · MongoDB</div>
+        <div class="badge badge-2">🚀 <span>Open to Work</span></div>
+      </div>
+    </div> -->
     </div>
   </section>
 
@@ -1573,8 +1625,7 @@
           <p>Web Developer with <span>3 years</span> of experience building high-performance web applications using
             <span>React.js, Node.js, and MongoDB</span>. Specialized in developing custom <span>Shopify apps</span>,
             integrating <span>Shipping APIs (FedEx, UPS)</span>, <span>WhatsApp Business API</span>, and building
-            scalable deployment and API-proxy solutions.
-          </p>
+            scalable deployment and API-proxy solutions.</p>
           <p>Passionate about crafting seamless user experiences through clean, maintainable code. I thrive in Agile
             environments where I collaborate with cross-functional teams to deliver impactful, production-ready
             solutions.</p>
@@ -1585,6 +1636,7 @@
             <a href="#contact" class="btn-s" style="padding:9px 20px;font-size:.77rem;">Get In Touch</a>
           </div>
         </div>
+        <!-- <div class="about-img rv-r">👤</div> -->
         <div class="about-img">
           <img src="img/tamz.png" />
         </div>
@@ -1597,6 +1649,7 @@
     <div class="container">
       <div class="sec-label rv">Skills</div>
       <h2 class="sec-title rv"> <span class="hl">Competencies</span></h2>
+      <!-- <h2 class="sec-title rv">Core <span class="hl">Competencies</span></h2> -->
       <div class="underline rv"></div>
       <div class="comp-grid">
         <div class="comp-card rv d1">
@@ -1620,6 +1673,8 @@
             <li>Node JS</li>
             <li>Express JS</li>
             <li>REST APIs</li>
+            <!-- <li>GraphQL</li> -->
+            <!-- <li>FED / Third-party APIs</li> -->
             <li>MongoDB</li>
             <li>API Design</li>
             <li>Express Route</li>
@@ -1631,10 +1686,13 @@
           <h3>Tools / Additional Libraries</h3>
           <ul class="comp-list">
             <li>Git / GitHub</li>
+            <!-- <li>AWS (Lambda, S3)</li> -->
             <li>MongoDB Atlas</li>
+            <!-- <li>Shopify CLI</li>  -->
             <li>Postman</li>
             <li>Axios</li>
             <li>React Router</li>
+            <!-- <li>Cloudflare</li> -->
           </ul>
         </div>
       </div>
@@ -1685,6 +1743,7 @@
               <div class="proj-co">LA Confianza Tech</div>
               <div class="proj-title">Sendoship — Shopify Shipping App</div>
             </div>
+            <!-- <a href="#" class="proj-live"><span class="ldot"></span>View Live</a> -->
           </div>
           <div class="ov-lbl">// Overview</div>
           <p class="proj-desc">Custom Shopify application integrating FedEx and UPS APIs for real-time shipping rate
@@ -1714,7 +1773,8 @@
             <div>
               <div class="proj-co">Squash Apps Pvt Ltd</div>
               <div class="proj-title">Education Portal</div>
-            </div>
+            </div>ś
+            <!-- <a href="#" class="proj-live"><span class="ldot"></span>View Live</a> -->
           </div>
           <div class="ov-lbl">// Overview</div>
           <p class="proj-desc">Online education portal facilitating seamless and interactive learning experiences for
@@ -1725,12 +1785,17 @@
             <div class="feat">Added TypeScript for code reliability and maintainability</div>
             <div class="feat">Built interactive learning modules with React.js</div>
             <div class="feat">Integrated REST APIs for dynamic content delivery</div>
+            <!-- <div class="feat">Implemented real-time webhook integration</div>
+          <div class="feat">Reduced need for manual customer follow-up</div> -->
           </div>
           <div class="proj-impact"><strong>Impact:</strong> Enabled seamless digital learning experiences for students
             and educators.</div>
           <div class="tags">
             <span class="tag">React JS</span>
+            <!-- <span class="tag">Shopify Polaris</span> -->
             <span class="tag">Typescript</span>
+            <!-- <span class="tag">Express</span> -->
+            <!-- <span class="tag">WhatsApp Business API</span -->
             <span class="tag">REST APIs</span>
           </div>
         </div>
@@ -1740,7 +1805,8 @@
             <div>
               <div class="proj-co">Squash Apps Pvt Ltd</div>
               <div class="proj-title">Hospital Management System</div>
-            </div>
+            </div>ś
+            <!-- <a href="#" class="proj-live"><span class="ldot"></span>View Live</a> -->
           </div>
           <div class="ov-lbl">// Overview</div>
           <p class="proj-desc">Comprehensive hospital management system for managing patient records, appointments, and
@@ -1751,12 +1817,16 @@
             <div class="feat">Efficiently managed patient records, appointments, and medical history</div>
             <div class="feat">Combined Redux, Thunk middleware, and Redux Toolkit for effective state management</div>
             <div class="feat">Added TypeScript for reliability and maintainability</div>
+            <!-- <div class="feat">Implemented real-time webhook integration</div>
+          <div class="feat">Reduced need for manual customer follow-up</div> -->
           </div>
           <div class="proj-impact"><strong>Impact:</strong> Facilitated seamless patient care and improved overall
             hospital operational satisfaction.</div>
           <div class="tags">
             <span class="tag">React JS</span>
+            <!-- <span class="tag">Shopify Polaris</span> -->
             <span class="tag">Node JS</span><span class="tag">Express</span>
+            <!-- <span class="tag">WhatsApp Business API</span -->
             <span class="tag">REST APIs</span>
             <span class="tag">Redux</span>
           </div>
@@ -1801,113 +1871,168 @@
     </div>
   </section>
 
-  <!-- ── FEATURED PROJECTS — 3D COVERFLOW SLIDER ── -->
+  <!-- ── PERSONAL / OPEN SOURCE ── -->
+  <!-- <section id="personal">
+  <div class="container">
+    <div class="sec-label rv">Side Work</div>
+    <h2 class="sec-title rv">Personal / Open <span class="hl">Source</span></h2>
+    <div class="underline rv"></div>
+    <div class="p-grid">
+      <div class="rv-l">
+        <h3>Curated work — <span>Contributions and independent projects</span></h3>
+      </div>
+      <div class="p-cards rv-r">
+        <div class="p-card">
+          <h4>🛠 Shopify FedEx Rate Extension</h4>
+          <p>Open-source Shopify checkout extension for dynamic FedEx rate fetching. Handles weight-splitting and zone detection automatically.</p>
+        </div>
+        <div class="p-card">
+          <h4>📦 WhatsApp Order Notifier</h4>
+          <p>Node.js microservice for automated WhatsApp order lifecycle messages. Template-driven with multilingual support and webhook processing.</p>
+        </div>
+        <div class="p-card">
+          <h4>📊 MERN Analytics Boilerplate</h4>
+          <p>Starter kit with React + Redux Toolkit + Node + MongoDB with Docker Compose and GitHub Actions CI/CD pre-configured.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section> -->
+
+  <!-- ── FEATURED PROJECTS ── -->
   <section id="featured">
     <div class="container">
       <div class="sec-label rv">Built Projects</div>
       <h2 class="sec-title rv">Featured <span class="hl">Projects</span></h2>
       <div class="underline rv"></div>
       <p class="fp-sub rv">Full-stack applications — <span>independently designed and developed</span></p>
+      <!-- Carousel wrapper -->
+      <div class="fp-carousel" id="fpCarousel" role="region" aria-label="Featured Projects Carousel">
+        <div class="fp-viewport">
+          <div class="fp-track" id="fpTrack">
 
-      <!-- cf-carousel: the perspective wrapper. cf-stage holds the cards;
-           JS reads every .cf-card inside it and positions them by index. -->
-      <div class="cf-carousel" id="cfCarousel">
-        <div class="cf-stage" id="cfStage">
-
-          <!-- Weather App -->
-          <div class="cf-card">
-            <div class="cf-card-body">
-              <!-- <img class="fp-card-cover" src="img/weather-app-cover.jpg" alt="Weather App preview" /> -->
+            <!-- Weather App -->
+            <div class="fp-card" role="group" aria-label="Project 1 of 3: Weather App">
               <div class="fp-card-icon">🌤️</div>
-              <div class="fp-card-type">Full-Stack App</div>
+              <div class="fp-card-type">Full-Stack Application</div>
               <div class="fp-card-title">Weather App</div>
-              <p class="fp-card-desc">Real-time weather data with geolocation support, presented through a clean,
-                responsive interface backed by a secure API proxy.</p>
+              <p class="fp-card-desc">Full-stack weather application that fetches real-time meteorological data and
+                presents it through a clean, responsive interface with geolocation support.</p>
+              <div class="fp-feat-lbl">// Key Features</div>
+              <ul class="fp-feats">
+                <li>Real-time weather data via Weather API integration</li>
+                <li>Geolocation-based automatic city detection</li>
+                <li>Responsive UI with dynamic weather visuals</li>
+                <li>RESTful backend proxy for secure API key management</li>
+              </ul>
               <div class="fp-tags">
                 <span class="fp-tag">React.js</span>
+                <span class="fp-tag">JavaScript</span>
+                <span class="fp-tag">Tailwind CSS</span>
                 <span class="fp-tag">Node.js</span>
+                <span class="fp-tag">Express.js</span>
                 <span class="fp-tag">REST API</span>
               </div>
               <div class="fp-btns">
                 <a href="https://github.com" target="_blank" class="fp-btn-gh">⌥ GitHub</a>
-                <a href="https://weather-app-hazel-three-34.vercel.app/" target="_blank" class="fp-btn-demo">↗ Live Demo</a>
+                <a href="#" target="_blank" class="fp-btn-demo">↗ Live Demo</a>
               </div>
             </div>
-          </div>
 
-          <!-- Movie App -->
-          <div class="cf-card">
-            <div class="cf-card-body">
-              <!-- <img class="fp-card-cover" src="img/movie-app-cover.jpg" alt="Movie App preview" /> -->
+            <!-- Movie App -->
+            <div class="fp-card" role="group" aria-label="Project 2 of 3: Movie App">
               <div class="fp-card-icon">🎬</div>
-              <div class="fp-card-type">Full-Stack App</div>
+              <div class="fp-card-type">Full-Stack Application</div>
               <div class="fp-card-title">Movie App</div>
-              <p class="fp-card-desc">Movie discovery app with search, category filters, and detailed pages for cast
-                and trailer info via the TMDB API.</p>
+              <p class="fp-card-desc">Real-time movie discovery application with rich browsing, search functionality,
+                and detailed movie information including cast and metadata.</p>
+              <div class="fp-feat-lbl">// Key Features</div>
+              <ul class="fp-feats">
+                <li>Live movie data via TMDB API integration</li>
+                <li>Search, browse, and filter by category</li>
+                <li>Detailed movie pages with cast and trailer info</li>
+                <li>Clean, responsive interface with smooth transitions</li>
+              </ul>
               <div class="fp-tags">
                 <span class="fp-tag">React.js</span>
+                <span class="fp-tag">JavaScript</span>
+                <span class="fp-tag">Tailwind CSS</span>
                 <span class="fp-tag">Node.js</span>
+                <span class="fp-tag">Express.js</span>
                 <span class="fp-tag">TMDB API</span>
               </div>
               <div class="fp-btns">
                 <a href="https://github.com" target="_blank" class="fp-btn-gh">⌥ GitHub</a>
-                <a href="https://thamil-movie-app.vercel.app/" target="_blank" class="fp-btn-demo">↗ Live Demo</a>
+                <a href="#" target="_blank" class="fp-btn-demo">↗ Live Demo</a>
               </div>
             </div>
-          </div>
 
-          <!-- JWT Auth App -->
-          <div class="cf-card">
-            <div class="cf-card-body">
-              <!-- <img class="fp-card-cover" src="img/jwt-auth-cover.jpg" alt="JWT Authentication System preview" /> -->
+            <!-- JWT Auth App -->
+            <div class="fp-card" role="group" aria-label="Project 3 of 3: JWT Authentication System">
               <div class="fp-card-icon">🔐</div>
-              <div class="fp-card-type">Full-Stack App</div>
+              <div class="fp-card-type">Full-Stack Application</div>
               <div class="fp-card-title">JWT Authentication System</div>
-              <p class="fp-card-desc">End-to-end auth flow: JWT issuance/refresh, bcrypt password hashing, and
-                protected routes on both frontend and API.</p>
+              <p class="fp-card-desc">JWT-based authentication system demonstrating secure end-to-end auth flow with
+                user registration, login, and protected route management.</p>
+              <div class="fp-feat-lbl">// Key Features</div>
+              <ul class="fp-feats">
+                <li>JWT token issuance, verification and refresh flow</li>
+                <li>Secure user registration with bcrypt password hashing</li>
+                <li>Protected frontend routes and backend API endpoints</li>
+                <li>MongoDB for persistent user data storage</li>
+              </ul>
               <div class="fp-tags">
                 <span class="fp-tag">React.js</span>
+                <span class="fp-tag">JavaScript</span>
+                <span class="fp-tag">Node.js</span>
                 <span class="fp-tag">Express.js</span>
                 <span class="fp-tag">MongoDB</span>
+                <span class="fp-tag">JWT</span>
               </div>
               <div class="fp-btns">
                 <a href="https://github.com" target="_blank" class="fp-btn-gh">⌥ GitHub</a>
                 <a href="#" target="_blank" class="fp-btn-demo">↗ Live Demo</a>
               </div>
             </div>
-          </div>
-
-          <!-- Shipping Rate App -->
-          <div class="cf-card">
-            <div class="cf-card-body">
-              <!-- <img class="fp-card-cover" src="img/shipping-rate-cover.jpg" alt="Shipping Rate Calculator preview" /> -->
-              <div class="fp-card-icon">📦</div>
-              <div class="fp-card-type">Full-Stack App</div>
-              <div class="fp-card-title">Shipping Rate Calculator</div>
-              <p class="fp-card-desc">Standalone tool that mirrors the Sendoship logic — live FedEx/UPS rate lookups
-                from a single shipment form.</p>
+            <!-- JWT Auth App -->
+            <div class="fp-card" role="group" aria-label="Project 3 of 3: JWT Authentication System">
+              <div class="fp-card-icon">🔐</div>
+              <div class="fp-card-type">Full-Stack Application</div>
+              <div class="fp-card-title">JWT Authentication System</div>
+              <p class="fp-card-desc">JWT-based authentication system demonstrating secure end-to-end auth flow with
+                user registration, login, and protected route management.</p>
+              <div class="fp-feat-lbl">// Key Features</div>
+              <ul class="fp-feats">
+                <li>JWT token issuance, verification and refresh flow</li>
+                <li>Secure user registration with bcrypt password hashing</li>
+                <li>Protected frontend routes and backend API endpoints</li>
+                <li>MongoDB for persistent user data storage</li>
+              </ul>
               <div class="fp-tags">
+                <span class="fp-tag">React.js</span>
+                <span class="fp-tag">JavaScript</span>
                 <span class="fp-tag">Node.js</span>
-                <span class="fp-tag">FedEx API</span>
-                <span class="fp-tag">UPS API</span>
+                <span class="fp-tag">Express.js</span>
+                <span class="fp-tag">MongoDB</span>
+                <span class="fp-tag">JWT</span>
               </div>
               <div class="fp-btns">
                 <a href="https://github.com" target="_blank" class="fp-btn-gh">⌥ GitHub</a>
                 <a href="#" target="_blank" class="fp-btn-demo">↗ Live Demo</a>
               </div>
             </div>
-          </div>
 
-        </div><!-- /cf-stage -->
+          </div><!-- /fp-track -->
+        </div><!-- /fp-viewport -->
 
-        <!-- controls: JS wires these to the same goTo() used by clicking a card -->
-        <div class="cf-controls">
-          <button class="cf-arrow" id="cfPrev" aria-label="Previous project">&#8592;</button>
-          <div class="cf-dots" id="cfDots"></div>
-          <button class="cf-arrow" id="cfNext" aria-label="Next project">&#8594;</button>
+        <!-- Navigation controls -->
+        <div class="fp-controls" id="fpControls">
+          <button class="fp-arrow" id="fpPrev" aria-label="Previous project">&#8592;</button>
+          <div class="fp-dots" id="fpDots" role="tablist" aria-label="Project navigation"></div>
+          <button class="fp-arrow" id="fpNext" aria-label="Next project">&#8594;</button>
         </div>
 
-      </div><!-- /cf-carousel -->
+      </div><!-- /fp-carousel -->
     </div>
   </section>
 
@@ -1962,7 +2087,17 @@
             <a href="file/Thamil Alagan R.pdf" target="_blank" class="btn-p"
               download="Thamil Alagan R - Resume">Download Resume</a>
           </div>
+          <!-- <div class="c-item"><div class="c-ico">💻</div><div><div class="c-lbl">GitHub</div><div class="c-val"><a href="https://github.com/thamil-alagan" target="_blank">github.com/thamil-alagan</a></div></div></div> -->
         </div>
+        <!-- <div class="rv-r">
+        <div class="f-row">
+          <div class="fg"><label>Your Name</label><input type="text" placeholder="John Doe" /></div>
+          <div class="fg"><label>Your Email</label><input type="email" placeholder="john@example.com" /></div>
+        </div>
+        <div class="fg"><label>Subject</label><input type="text" placeholder="Project idea or challenge" /></div>
+        <div class="fg"><label>Your Message</label><textarea placeholder="Tell me about your project..."></textarea></div>
+        <button class="form-btn"><span>Send Message</span><span>→</span></button>
+      </div> -->
       </div>
     </div>
   </section>
@@ -1972,6 +2107,7 @@
     <div class="f-copy">© 2026 <span>Thamil Alagan R</span> </div>
     <div class="f-links">
       <a href="#home">Back to Top ↑</a>
+      <!-- <a href="https://github.com" target="_blank">GitHub</a> -->
       <a href="https://linkedin.com" target="_blank">LinkedIn</a>
     </div>
   </footer>
@@ -2045,113 +2181,174 @@
     }
     setTimeout(type, 1200);
 
-    /* ══════════════════════════════════════════════════════════
-       FEATURED PROJECTS — 3D COVERFLOW SLIDER LOGIC
-       This is the code that recreates the reference-image effect:
-       a centered, glowing card with the neighbors tilted/scaled
-       back in 3D space on either side.
-       ══════════════════════════════════════════════════════════ */
+    /* ──────────────────────────────────────────
+       FEATURED PROJECTS CAROUSEL
+    ────────────────────────────────────────── */
     (function () {
-      const stage = document.getElementById('cfStage');
-      const dotsWrap = document.getElementById('cfDots');
-      const btnPrev = document.getElementById('cfPrev');
-      const btnNext = document.getElementById('cfNext');
-      if (!stage) return;
+      const carousel = document.getElementById('fpCarousel');
+      const track = document.getElementById('fpTrack');
+      const dotsWrap = document.getElementById('fpDots');
+      const btnPrev = document.getElementById('fpPrev');
+      const btnNext = document.getElementById('fpNext');
+      if (!carousel || !track) return;
 
-      const cards = Array.from(stage.children);
+      const cards = Array.from(track.children);
       const TOTAL = cards.length;
-      let active = 0;
+      const GAP = 24; // px — matches CSS gap
+      const AUTOPLAY_MS = 4000;
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      let current = 0;   // logical index (0-based)
+      let visCount = 1;   // cards visible at once
+      let cardW = 0;   // resolved card pixel width
       let autoTimer = null;
-      const AUTOPLAY_MS = 3500;
+      let isDesktop = false;
 
-      /* Per-offset 3D transform — this single function is the whole
-         "coverflow" trick: offset 0 = dead center, |offset| 1 = the
-         immediate neighbors (tilted + pushed back), |offset| 2+ = hidden. */
-      function styleFor(offset) {
-        const abs = Math.abs(offset);
-        if (abs > 2) {
-          return { transform: `translateX(${offset * 260}px) translateZ(-500px) rotateY(${offset > 0 ? -40 : 40}deg) scale(.6)`, opacity: 0, cls: 'cf-card--hidden' };
-        }
-        if (offset === 0) {
-          return { transform: 'translateX(0) translateZ(0) rotateY(0deg) scale(1)', opacity: 1, cls: 'cf-card--center' };
-        }
-        const dir = offset > 0 ? 1 : -1;
-        const x = dir * (170 + (abs - 1) * 90);
-        const z = -160 - (abs - 1) * 90;
-        const rot = dir * -38;
-        const sc = 1 - abs * 0.16;
-        const op = abs === 1 ? 1 : 0.35;
-        return { transform: `translateX(${x}px) translateZ(${z}px) rotateY(${rot}deg) scale(${sc})`, opacity: op, cls: 'cf-card--side' };
+      /* ── Layout ─────────────────────────── */
+      function getVisCount() {
+        const vw = carousel.offsetWidth;
+        if (vw >= 900) return 3;
+        if (vw >= 560) return 2;
+        return 1;
       }
 
-      /* Re-render: loop every card, compute its offset from `active`
-         (wrapping so the deck feels endless), then apply the transform. */
-      function render() {
-        cards.forEach((card, i) => {
-          let offset = i - active;
-          if (offset > TOTAL / 2) offset -= TOTAL;
-          if (offset < -TOTAL / 2) offset += TOTAL;
+      function layout() {
+        const vw = carousel.offsetWidth;
+        visCount = getVisCount();
+        isDesktop = visCount >= TOTAL;
 
-          const s = styleFor(offset);
-          card.style.transform = s.transform;
-          card.style.opacity = s.opacity;
-          card.style.zIndex = 100 - Math.abs(offset);
-          card.classList.remove('cf-card--center', 'cf-card--side', 'cf-card--hidden');
-          card.classList.add(s.cls);
-        });
+        // card width = (viewport - gaps between visible cards) / visCount
+        cardW = (vw - GAP * (visCount - 1)) / visCount;
+        cards.forEach(c => { c.style.width = cardW + 'px'; });
+
+        // Desktop: show all, no controls needed
+        carousel.classList.toggle('fp-desktop', isDesktop);
+
+        // Clamp current index; re-render
+        current = Math.min(current, TOTAL - visCount);
+        render(false); // no animation on resize
+        buildDots();
+        updateDim();
+      }
+
+      /* ── Render position ─────────────────── */
+      function render(animate = true) {
+        const offset = current * (cardW + GAP);
+        if (reducedMotion || !animate) {
+          track.style.transition = 'none';
+        } else {
+          track.style.transition = 'transform .5s cubic-bezier(.4,0,.2,1)';
+        }
+        track.style.transform = `translateX(-${offset}px)`;
+
+        // Restore transition after instant jump
+        if (reducedMotion || !animate) {
+          requestAnimationFrame(() => {
+            track.style.transition = reducedMotion ? 'none' : 'transform .5s cubic-bezier(.4,0,.2,1)';
+          });
+        }
         updateDots();
+        updateDim();
       }
 
-      function goTo(i) {
-        active = (i + TOTAL) % TOTAL;
-        render();
+      /* ── Dim non-active (mobile/tablet) ─── */
+      function updateDim() {
+        if (isDesktop) {
+          cards.forEach(c => c.classList.remove('fp-dim'));
+          return;
+        }
+        cards.forEach((c, i) => {
+          const active = i >= current && i < current + visCount;
+          c.classList.toggle('fp-dim', !active);
+        });
       }
 
-      /* Click a side card to bring it to center */
-      /* Click a side card to bring it to center — but ignore clicks on
-         real links (GitHub / Live Demo) so they navigate normally,
-         and don't fight with the card's own inner scroll. */
-      cards.forEach((card, i) => card.addEventListener('click', (e) => {
-        if (e.target.closest('a')) return;
-        goTo(i);
-        resetAutoplay();
-      }));
+      /* ── Navigation ─────────────────────── */
+      function goTo(idx, animate = true) {
+        // Infinite loop: wrap at boundaries
+        if (idx < 0) idx = TOTAL - visCount;
+        if (idx > TOTAL - visCount) idx = 0;
+        current = idx;
+        render(animate);
+      }
 
-      btnPrev.addEventListener('click', () => { goTo(active - 1); resetAutoplay(); });
-      btnNext.addEventListener('click', () => { goTo(active + 1); resetAutoplay(); });
+      btnPrev.addEventListener('click', () => { goTo(current - 1); resetAutoplay(); });
+      btnNext.addEventListener('click', () => { goTo(current + 1); resetAutoplay(); });
 
+      /* ── Dot pagination ──────────────────── */
       function buildDots() {
         dotsWrap.innerHTML = '';
-        cards.forEach((_, i) => {
+        const count = TOTAL - visCount + 1;
+        for (let i = 0; i < count; i++) {
           const d = document.createElement('button');
-          d.className = 'cf-dot' + (i === active ? ' active' : '');
+          d.className = 'fp-dot' + (i === current ? ' active' : '');
+          d.setAttribute('role', 'tab');
           d.setAttribute('aria-label', `Go to project ${i + 1}`);
+          d.setAttribute('aria-selected', i === current ? 'true' : 'false');
           d.addEventListener('click', () => { goTo(i); resetAutoplay(); });
           dotsWrap.appendChild(d);
+        }
+      }
+
+      function updateDots() {
+        Array.from(dotsWrap.children).forEach((d, i) => {
+          const active = i === current;
+          d.classList.toggle('active', active);
+          d.setAttribute('aria-selected', active ? 'true' : 'false');
         });
       }
-      function updateDots() {
-        Array.from(dotsWrap.children).forEach((d, i) => d.classList.toggle('active', i === active));
+
+      /* ── Autoplay ────────────────────────── */
+      function startAutoplay() {
+        if (reducedMotion || isDesktop) return;
+        autoTimer = setInterval(() => goTo(current + 1), AUTOPLAY_MS);
       }
+      function stopAutoplay() { clearInterval(autoTimer); autoTimer = null; }
+      function resetAutoplay() { stopAutoplay(); startAutoplay(); }
 
-      // function startAutoplay() { autoTimer = setInterval(() => goTo(active + 1), AUTOPLAY_MS); }
-      function stopAutoplay() { clearInterval(autoTimer); }
-      // function resetAutoplay() { stopAutoplay(); startAutoplay(); }
+      carousel.addEventListener('mouseenter', stopAutoplay);
+      carousel.addEventListener('mouseleave', startAutoplay);
+      carousel.addEventListener('focusin', stopAutoplay);
+      carousel.addEventListener('focusout', startAutoplay);
 
-      document.getElementById('cfCarousel').addEventListener('mouseenter', stopAutoplay);
-      // document.getElementById('cfCarousel').addEventListener('mouseleave', startAutoplay);
-
-      /* Swipe support */
-      let touchX = 0;
-      stage.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
-      stage.addEventListener('touchend', e => {
-        const dx = e.changedTouches[0].clientX - touchX;
-        if (Math.abs(dx) > 40) { goTo(active + (dx < 0 ? 1 : -1)); resetAutoplay(); }
+      /* ── Touch/Swipe ─────────────────────── */
+      let touchStartX = 0, touchStartY = 0, dragging = false;
+      track.addEventListener('touchstart', e => {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        dragging = true;
+      }, { passive: true });
+      track.addEventListener('touchmove', e => {
+        if (!dragging) return;
+        // Prevent page scroll only on clear horizontal swipe
+        const dx = Math.abs(e.touches[0].clientX - touchStartX);
+        const dy = Math.abs(e.touches[0].clientY - touchStartY);
+        if (dx > dy && dx > 8) e.preventDefault();
+      }, { passive: false });
+      track.addEventListener('touchend', e => {
+        if (!dragging) return;
+        dragging = false;
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(dx) > 50) {
+          goTo(dx < 0 ? current + 1 : current - 1);
+          resetAutoplay();
+        }
       }, { passive: true });
 
-      buildDots();
-      render();
-      // startAutoplay();
+      /* ── Keyboard navigation ─────────────── */
+      carousel.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft') { goTo(current - 1); resetAutoplay(); e.preventDefault(); }
+        if (e.key === 'ArrowRight') { goTo(current + 1); resetAutoplay(); e.preventDefault(); }
+      });
+      carousel.setAttribute('tabindex', '0');
+
+      /* ── Responsive: observe resize ─────── */
+      const ro = new ResizeObserver(() => layout());
+      ro.observe(carousel);
+
+      /* ── Init ────────────────────────────── */
+      layout();
+      startAutoplay();
     })();
   </script>
 </body>

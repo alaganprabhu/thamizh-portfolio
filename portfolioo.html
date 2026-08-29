@@ -1281,49 +1281,15 @@
       margin-bottom: 8px;
     }
 
-    /* Scrollable inner wrapper — lets each card hold a cover image +
-       full description without growing the card itself. The card
-       (.cf-card) stays a fixed size for the 3D transforms; this is
-       the only element that scrolls. */
-    .cf-card-body {
-      height: 100%;
-      overflow-y: auto;
-      padding-right: 6px;
-      /* keeps text off the scrollbar   */
-      scrollbar-width: thin;
-      scrollbar-color: var(--brh) transparent;
-    }
-
-    .cf-card-body::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    .cf-card-body::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    .cf-card-body::-webkit-scrollbar-thumb {
-      background: var(--brh);
-      border-radius: 2px;
-    }
-
-    /* Project cover image — sits at the top of the card body */
-    .fp-card-cover {
-      display: block;
-      width: 100%;
-      height: 130px;
-      object-fit: cover;
-      border-radius: 10px;
-      margin-bottom: 14px;
-      border: 1px solid var(--br);
-    }
-
     .fp-card-desc {
       font-size: .74rem;
       color: var(--t2);
       line-height: 1.65;
       margin-bottom: 14px;
-      /* no line-clamp here — the body scrolls, so full text is fine */
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .fp-tags {
@@ -1816,11 +1782,14 @@
 
           <!-- Weather App -->
           <div class="cf-card">
-            <div class="cf-card-body">
-              <!-- <img class="fp-card-cover" src="img/weather-app-cover.jpg" alt="Weather App preview" /> -->
+            <div style="overflow-y: scroll;">
+
               <div class="fp-card-icon">🌤️</div>
               <div class="fp-card-type">Full-Stack App</div>
               <div class="fp-card-title">Weather App</div>
+              <div style="width: 100%; height: 160px">
+                <img src="../portfolio/img/tamz.png" style="width: 90%; height: 150px" />
+              </div>
               <p class="fp-card-desc">Real-time weather data with geolocation support, presented through a clean,
                 responsive interface backed by a secure API proxy.</p>
               <div class="fp-tags">
@@ -1830,71 +1799,62 @@
               </div>
               <div class="fp-btns">
                 <a href="https://github.com" target="_blank" class="fp-btn-gh">⌥ GitHub</a>
-                <a href="https://weather-app-hazel-three-34.vercel.app/" target="_blank" class="fp-btn-demo">↗ Live Demo</a>
+                <a href="#" target="_blank" class="fp-btn-demo">↗ Live Demo</a>
               </div>
             </div>
           </div>
 
           <!-- Movie App -->
           <div class="cf-card">
-            <div class="cf-card-body">
-              <!-- <img class="fp-card-cover" src="img/movie-app-cover.jpg" alt="Movie App preview" /> -->
-              <div class="fp-card-icon">🎬</div>
-              <div class="fp-card-type">Full-Stack App</div>
-              <div class="fp-card-title">Movie App</div>
-              <p class="fp-card-desc">Movie discovery app with search, category filters, and detailed pages for cast
-                and trailer info via the TMDB API.</p>
-              <div class="fp-tags">
-                <span class="fp-tag">React.js</span>
-                <span class="fp-tag">Node.js</span>
-                <span class="fp-tag">TMDB API</span>
-              </div>
-              <div class="fp-btns">
-                <a href="https://github.com" target="_blank" class="fp-btn-gh">⌥ GitHub</a>
-                <a href="https://thamil-movie-app.vercel.app/" target="_blank" class="fp-btn-demo">↗ Live Demo</a>
-              </div>
+            <div class="fp-card-icon">🎬</div>
+            <div class="fp-card-type">Full-Stack App</div>
+            <div class="fp-card-title">Movie App</div>
+            <p class="fp-card-desc">Movie discovery app with search, category filters, and detailed pages for cast
+              and trailer info via the TMDB API.</p>
+            <div class="fp-tags">
+              <span class="fp-tag">React.js</span>
+              <span class="fp-tag">Node.js</span>
+              <span class="fp-tag">TMDB API</span>
+            </div>
+            <div class="fp-btns">
+              <a href="https://github.com" target="_blank" class="fp-btn-gh">⌥ GitHub</a>
+              <a href="#" target="_blank" class="fp-btn-demo">↗ Live Demo</a>
             </div>
           </div>
 
           <!-- JWT Auth App -->
           <div class="cf-card">
-            <div class="cf-card-body">
-              <!-- <img class="fp-card-cover" src="img/jwt-auth-cover.jpg" alt="JWT Authentication System preview" /> -->
-              <div class="fp-card-icon">🔐</div>
-              <div class="fp-card-type">Full-Stack App</div>
-              <div class="fp-card-title">JWT Authentication System</div>
-              <p class="fp-card-desc">End-to-end auth flow: JWT issuance/refresh, bcrypt password hashing, and
-                protected routes on both frontend and API.</p>
-              <div class="fp-tags">
-                <span class="fp-tag">React.js</span>
-                <span class="fp-tag">Express.js</span>
-                <span class="fp-tag">MongoDB</span>
-              </div>
-              <div class="fp-btns">
-                <a href="https://github.com" target="_blank" class="fp-btn-gh">⌥ GitHub</a>
-                <a href="#" target="_blank" class="fp-btn-demo">↗ Live Demo</a>
-              </div>
+            <div class="fp-card-icon">🔐</div>
+            <div class="fp-card-type">Full-Stack App</div>
+            <div class="fp-card-title">JWT Authentication System</div>
+            <p class="fp-card-desc">End-to-end auth flow: JWT issuance/refresh, bcrypt password hashing, and
+              protected routes on both frontend and API.</p>
+            <div class="fp-tags">
+              <span class="fp-tag">React.js</span>
+              <span class="fp-tag">Express.js</span>
+              <span class="fp-tag">MongoDB</span>
+            </div>
+            <div class="fp-btns">
+              <a href="https://github.com" target="_blank" class="fp-btn-gh">⌥ GitHub</a>
+              <a href="#" target="_blank" class="fp-btn-demo">↗ Live Demo</a>
             </div>
           </div>
 
           <!-- Shipping Rate App -->
           <div class="cf-card">
-            <div class="cf-card-body">
-              <!-- <img class="fp-card-cover" src="img/shipping-rate-cover.jpg" alt="Shipping Rate Calculator preview" /> -->
-              <div class="fp-card-icon">📦</div>
-              <div class="fp-card-type">Full-Stack App</div>
-              <div class="fp-card-title">Shipping Rate Calculator</div>
-              <p class="fp-card-desc">Standalone tool that mirrors the Sendoship logic — live FedEx/UPS rate lookups
-                from a single shipment form.</p>
-              <div class="fp-tags">
-                <span class="fp-tag">Node.js</span>
-                <span class="fp-tag">FedEx API</span>
-                <span class="fp-tag">UPS API</span>
-              </div>
-              <div class="fp-btns">
-                <a href="https://github.com" target="_blank" class="fp-btn-gh">⌥ GitHub</a>
-                <a href="#" target="_blank" class="fp-btn-demo">↗ Live Demo</a>
-              </div>
+            <div class="fp-card-icon">📦</div>
+            <div class="fp-card-type">Full-Stack App</div>
+            <div class="fp-card-title">Shipping Rate Calculator</div>
+            <p class="fp-card-desc">Standalone tool that mirrors the Sendoship logic — live FedEx/UPS rate lookups
+              from a single shipment form.</p>
+            <div class="fp-tags">
+              <span class="fp-tag">Node.js</span>
+              <span class="fp-tag">FedEx API</span>
+              <span class="fp-tag">UPS API</span>
+            </div>
+            <div class="fp-btns">
+              <a href="https://github.com" target="_blank" class="fp-btn-gh">⌥ GitHub</a>
+              <a href="#" target="_blank" class="fp-btn-demo">↗ Live Demo</a>
             </div>
           </div>
 
@@ -2108,14 +2068,7 @@
       }
 
       /* Click a side card to bring it to center */
-      /* Click a side card to bring it to center — but ignore clicks on
-         real links (GitHub / Live Demo) so they navigate normally,
-         and don't fight with the card's own inner scroll. */
-      cards.forEach((card, i) => card.addEventListener('click', (e) => {
-        if (e.target.closest('a')) return;
-        goTo(i);
-        resetAutoplay();
-      }));
+      cards.forEach((card, i) => card.addEventListener('click', () => { goTo(i); resetAutoplay(); }));
 
       btnPrev.addEventListener('click', () => { goTo(active - 1); resetAutoplay(); });
       btnNext.addEventListener('click', () => { goTo(active + 1); resetAutoplay(); });
